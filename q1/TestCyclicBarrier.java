@@ -36,13 +36,14 @@ public class TestCyclicBarrier implements Runnable {
 		}
 	}
 
-	public static void main(String[] args){
+	public static void main(String[] args) {
 		int N = 10000, sum=0;
 		int[] a = new int[N];	
 		int[] b = new int[N];	
 		TestCyclicBarrier[] tcb = new TestCyclicBarrier[N];
 		CyclicBarrier cb = new CyclicBarrier(N);
 		Thread[] t = new Thread[N];
+        
 		for(int i=0; i<N; i++){
 			tcb[i] =new TestCyclicBarrier(cb,a,b,i,N);
 			t[i] = new Thread(tcb[i]);

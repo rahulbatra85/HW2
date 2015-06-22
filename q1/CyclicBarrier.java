@@ -11,7 +11,7 @@ public class CyclicBarrier {
   public CyclicBarrier(int parties) {
     // TODO: The constructor for this CyclicBarrier
 	this.numParties = parties;
-	this.arrived = 0;
+	this.arrived = parties ; //this.arrived = 0;
 	mutex = new Semaphore(1);
 	s = new Semaphore[numParties];
 	for(int i=0; i<numParties; i++){
@@ -24,29 +24,30 @@ public class CyclicBarrier {
     // If the current thread is not the last to arrive then it is
     // disabled for thread scheduling purposes and lies dormant until
     // the last thread arrives.
+    
     // Returns: the arrival index of the current thread, where index
     // (parties - 1) indicates the first to arrive and zero indicates
     // the last to arrive.
 
-	int idx;
-	//Atomically increase partiesArrived
-	mutex.acquire();
-	idx = arrived;
-	arrived++;
+	//NOT SURE IF NEEDED --- int idx;
+	mutex.acquire(); //Atomically increase partiesArrived
+	//idx = arrived;
+	arrived--; //Per description above //arrived++;
 	
-	if (arrived == numParties){
+	if (arrived == 0) { //numParties){
 		//release all semaphores
-		for(int i=0; i<numParties; i++){
+		for(int i=1; i<numParties; i++) { //s[0] will never be used
 			s[i].release();
 		//	System.out.println("Barrier Tripped");
 		}
-		mutex.release();
-		return idx;
-	} else{
+	} 
+    else {
 		//System.out.println("Idx " + idx + " arrived");
-		mutex.release();
-		s[arrived-1].acquire();
-		return idx;
+		s[arrived].acquire(); //Clever ... Make all threads wait // s[arrived-1].acquire();
 	}
+    
+    mutex.release();
+    return arrived;
   }
+  
 }
