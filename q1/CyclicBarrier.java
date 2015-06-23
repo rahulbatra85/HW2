@@ -11,13 +11,13 @@ public class CyclicBarrier {
   public CyclicBarrier(int parties) {
     // TODO: The constructor for this CyclicBarrier
     this.numParties = parties;
-    this.arrived = parties ; //this.arrived = 0;
+    this.arrived = parties ; 
 
     mutex = new Semaphore(1);
     s = new Semaphore[numParties];
 
     for(int i=0; i<numParties; i++) {
-        s[i] = new Semaphore(1); // if init to 0 someone has to release first
+        s[i] = new Semaphore(0, true); 
     }
 
   }
@@ -43,20 +43,19 @@ public class CyclicBarrier {
         for(int i=1; i<numParties; i++) { //s[0] will never be used
             s[i].release();
         }
+        System.out.println("Barrier Tripped; arrived = " + arrived);
         //Reset arrived to numParties again so the barrier can be used again
         arrived = numParties;
-        //System.out.println("Barrier Tripped; arrived = " + arrived);
         mutex.release();
-        return idx; //Trying to solve bug below
+
     }
     else {
-        //System.out.println("arrived =  " + arrived);
+        System.out.println("arrived =  " + arrived);
         mutex.release(); // has to be released before setting itself in wait mode
         s[arrived].acquire(); //Clever ... Make threads wait // s[arrived-1].acquire();
-        return idx;
     }
-   // Bug: Bunch of zeroes and duplicates arriving at the same time  --- return arrived;
     
+    return idx; 
   }
 
 }

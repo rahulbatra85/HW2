@@ -25,7 +25,7 @@ public class TestCyclicBarrier implements Runnable {
             e.printStackTrace();
         }
         
-        System.out.println("\tThread arrived index " + a);
+        System.out.println("\tThread done. Arrived index: " + a);
         
         
         /* COMMENTING OUT FOR NOW -- NOT CLEAR WHAT WE'RE TESTING FOR
@@ -47,21 +47,21 @@ public class TestCyclicBarrier implements Runnable {
     // not working --- public int get_arrived() { return id; }
 
 	public static void main(String[] args) {
-		int N = 100, sum=0;
+		int N = 20, sum=0;
 		int[] a = new int[N];	
 		int[] b = new int[N];	
         
-		TestCyclicBarrier[] tcb = new TestCyclicBarrier[N];
+		TestCyclicBarrier[] tcb = new TestCyclicBarrier[N*4];
 		CyclicBarrier cb = new CyclicBarrier(N);
+        Thread[] t = new Thread[N];
 		
         
-		for(int x=0; x<N; x++) {
-            
-			tcb[x] = new TestCyclicBarrier(cb,a,b,x,N);
-            Thread[] t = new Thread[N];
+		for(int x=0; x<N*4; x++) {
+            System.out.println ("Iteration "+x);
+			tcb[x] = new TestCyclicBarrier(cb,a,b,x,N);            
 		
-		    for(int i=0; i<N; i++){
-                // can be reused after all waiting threads have been released
+		    for(int i=0; i<N; i++) {
+                // cb can be reused after all waiting threads have been released
                 t[i] = new Thread(tcb[x]); // t[i] = new Thread(tcb[i]); 
                 sum += i;      
 		    }
@@ -79,7 +79,7 @@ public class TestCyclicBarrier implements Runnable {
                 e.printStackTrace();
             }
              
-            System.out.println ("Iteration "+x+"\tsum is "+sum);
+            System.out.println ("Sum is "+sum);
             sum=0; 
 		}
         
