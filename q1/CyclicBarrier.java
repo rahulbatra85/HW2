@@ -5,7 +5,7 @@ public class CyclicBarrier {
   // Note that you can use only semaphores but not synchronized blocks and
   // locks
     int numParties, arrived;
-    Semaphore mutex;
+    Semaphore mutex, exec;
     Semaphore[] s;
 
   public CyclicBarrier(int parties) {
@@ -14,10 +14,11 @@ public class CyclicBarrier {
     this.arrived = parties ; 
 
     mutex = new Semaphore(1);
+    exec = new Semaphore(1);
     s = new Semaphore[numParties];
 
     for(int i=0; i<numParties; i++) {
-        s[i] = new Semaphore(0, true); 
+        s[i] = new Semaphore(0); 
     }
 
   }
@@ -33,31 +34,33 @@ public class CyclicBarrier {
     // the last to arrive.
 
     int idx; //LOCAL, UNIQUE TO EACH THREAD
-    mutex.acquire(); //Atomically decrease arrived
     
-    arrived--; //Per description above //arrived++;
+    mutex.acquire(); 
+    arrived--; //Per description above 
     idx = arrived;
-
-    if (arrived == 0) { //numParties){
-        System.out.println("Barrier Tripped; arrived = " + arrived);
-        
-        //Release all semaphores
+    mutex.release();
+    
+    if (arrived == 0) { 
+        //System.out.println("Barrier Tripped; arrived = " + arrived);        
+        //Release all semaphores, grab exec.
+        exec.acquire();
         for(int i=1; i<numParties; i++) { //s[0] will never be used
             s[i].release();
         }
-
-        //Reset arrived to numParties again so the barrier can be used again
-        arrived = numParties;
-        mutex.release();
-
     }
     else {
-        System.out.println("arrived =  " + arrived);
-        mutex.release(); // has to be released before setting itself in wait mode
-        s[arrived].acquire(); //Clever ... Make threads wait // s[arrived-1].acquire();
+        //System.out.println("arrived =  " + arrived);
+        s[idx].acquire(); //Clever ... Make threads wait 
     }
     
+    mutex.acquire();
+    arrived++;
+    if (arrived == numParties) //All threads are done
+        exec.release(); //make sure it's ready for reuse
+    mutex.release();
+    
     return idx; 
-  }
+  } 
 
+    
 }

@@ -17,7 +17,7 @@ public class TestCyclicBarrier implements Runnable {
 
 	public void run() {
 		//a[id] = id;
-        int a=-1;
+        int a = -1;
 		try{
 			a = cb.await(); //returns arrived index
 		}	
@@ -47,16 +47,16 @@ public class TestCyclicBarrier implements Runnable {
     // not working --- public int get_arrived() { return id; }
 
 	public static void main(String[] args) {
-		int N = 20, sum=0;
+		int N = 1000, sum=0;
 		int[] a = new int[N];	
 		int[] b = new int[N];	
         
-		TestCyclicBarrier[] tcb = new TestCyclicBarrier[N*4];
+		TestCyclicBarrier[] tcb = new TestCyclicBarrier[N];
 		CyclicBarrier cb = new CyclicBarrier(N);
         Thread[] t = new Thread[N];
 		
         
-		for(int x=0; x<N*4; x++) {
+		for(int x=0; x<N; x++) {
             System.out.println ("Iteration "+x);
 			tcb[x] = new TestCyclicBarrier(cb,a,b,x,N);            
 		
