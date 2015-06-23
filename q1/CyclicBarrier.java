@@ -39,11 +39,13 @@ public class CyclicBarrier {
     idx = arrived;
 
     if (arrived == 0) { //numParties){
+        System.out.println("Barrier Tripped; arrived = " + arrived);
+        
         //Release all semaphores
         for(int i=1; i<numParties; i++) { //s[0] will never be used
             s[i].release();
         }
-        System.out.println("Barrier Tripped; arrived = " + arrived);
+
         //Reset arrived to numParties again so the barrier can be used again
         arrived = numParties;
         mutex.release();
