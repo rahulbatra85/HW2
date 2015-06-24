@@ -62,5 +62,4 @@ public class CyclicBarrier {
     return idx; 
   } 
 
-    
 }
