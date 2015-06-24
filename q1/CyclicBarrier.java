@@ -3,24 +3,18 @@ import java.util.concurrent.Semaphore;
 public class CyclicBarrier {
   // TODO: Declare variables and the constructor for CyclicBarrier
   // Note that you can use only semaphores but not synchronized blocks and
-  // locks
-    int numParties, arrived;
-    Semaphore mutex, exec;
-    Semaphore[] s;
-
+  // locks 
+	int numParties, arrived;
+	Semaphore mutex;
+	Semaphore barrier1, barrier2;
+	
   public CyclicBarrier(int parties) {
     // TODO: The constructor for this CyclicBarrier
-    this.numParties = parties;
-    this.arrived = parties ; 
-
-    mutex = new Semaphore(1);
-    exec = new Semaphore(1);
-    s = new Semaphore[numParties];
-
-    for(int i=0; i<numParties; i++) {
-        s[i] = new Semaphore(0); 
-    }
-
+	this.numParties = parties; //Total number of threads
+	this.arrived = 0;	//Initially zero
+	mutex = new Semaphore(1);	//Ensured that arrive count is incremented atomically
+	barrier1 = new Semaphore(0); //Initially Closed
+	barrier2 = new Semaphore(1); //Initially Open
   }
 
   public int await() throws InterruptedException {
@@ -33,33 +27,43 @@ public class CyclicBarrier {
     // (parties - 1) indicates the first to arrive and zero indicates
     // the last to arrive.
 
-    int idx; //LOCAL, UNIQUE TO EACH THREAD
-    
-    mutex.acquire(); 
-    arrived--; //Per description above 
-    idx = arrived;
-    mutex.release();
-    
-    if (arrived == 0) { 
-        //System.out.println("Barrier Tripped; arrived = " + arrived);        
-        //Release all semaphores, grab exec.
-        exec.acquire();
-        for(int i=1; i<numParties; i++) { //s[0] will never be used
-            s[i].release();
-        }
-    }
-    else {
-        //System.out.println("arrived =  " + arrived);
-        s[idx].acquire(); //Clever ... Make threads wait 
-    }
-    
-    mutex.acquire();
-    arrived++;
-    if (arrived == numParties) //All threads are done
-        exec.release(); //make sure it's ready for reuse
-    mutex.release();
-    
-    return idx; 
-  } 
+	int idx;
+	idx = phase1(); //Phase 1 ensures that all threads wait at the barrier
+	phase2(); //Phase 2 resets the Cyclic barrier for reuse
+	return idx;
+  }
+
+	int phase1() throws InterruptedException {
+		int idx = 0;
+		mutex.acquire();
+		idx = arrived;
+		arrived++;
+	
+		//Nth thread opens barrier 1 and closes barrier2	
+		if(arrived == numParties){
+			barrier2.acquire(); 
+			barrier1.release(); //Release one thread 
+		}
+		mutex.release();
+
+		barrier1.acquire(); //All the N threads will wait here
+		barrier1.release(); //Each thread that passes through will signal one other thread
+		return idx;
+	}
+
+	void phase2() throws InterruptedException {
+		mutex.acquire();
+		arrived--; //All threads decrement, resetting by one
+		
+		//Nth thread closes barrier1 and opens barrier 2(resets Cyclic Barrier)
+		if(arrived == 0){
+			barrier1.acquire(); //Close barrier 1
+			barrier2.release(); //Let one thread go through barrier
+		}
+		mutex.release();
+
+		barrier2.acquire(); //All the N thread will wait here after resetting
+		barrier2.release(); //Each thread passes through will signal one other thread
+	}
 
 }
