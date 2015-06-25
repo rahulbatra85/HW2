@@ -33,7 +33,7 @@ public class SyncBathroomProtocol2 implements BathroomProtocol {
 
 	synchronized void SEnterMale(){
 		try {
-			wM = wM + 1;//Increment male waiting count
+			wM = wM + 1;//Increment male waiting countDefine_Sequence
 
 			//Conditions not ok to enter
 			// inUseFemale

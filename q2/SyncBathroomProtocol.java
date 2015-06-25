@@ -18,53 +18,63 @@ public class SyncBathroomProtocol implements BathroomProtocol {
         }
     }
     
-    Gender using = null;
-    boolean inUse = false;
-    int currUsers = 0;
-    
+    boolean inUse;
+    volatile int currUsers;
+	volatile Gender turn, using;
+
+
+	SyncBathroomProtocol() {
+        using = null;
+        inUse = false;
+        currUsers = 0;
+		turn = Gender.FEMALE;
+	}
+ 
     public void enterMale() {
-    
         increaseUsers(Gender.MALE);
     }
 
     public void leaveMale() {
-        decreaseUsers();
+        decreaseUsers(Gender.MALE);
     }
 
     public void enterFemale() {
-    
         increaseUsers(Gender.FEMALE);
     }
 
     public void leaveFemale() {
-        decreaseUsers();
+        decreaseUsers(Gender.FEMALE);
     }
     
     protected synchronized void increaseUsers (Gender g) { 
         //System.out.println("\t+:U="+currUsers+" G="+using+" Busy="+inUse);
-        while (inUse && (g.getOpposite() == using)) {
+        while ( inUse && (g.getOpposite() == using) ) {
+        //while ( (inUse && g.getOpposite() == using) || (g != turn && g == using)  ) {
             try { 
                 wait();
             }
             catch (Exception e) {}
         }
-        
+
         inUse = true;
         currUsers++; 
         using = g;
-        //System.out.println("\t+:U="+currUsers+" G="+using+" Busy="+inUse);
+        turn = g.getOpposite(); 
+        System.out.println("\t"+g+"+:numIn="+currUsers+" type"+using+" turn="+turn+" busy="+inUse);
    }
    
-   protected synchronized void decreaseUsers() { 
+   protected synchronized void decreaseUsers(Gender g) { 
         //System.out.println("\t-:U="+currUsers+" G="+using+" Busy="+inUse);
-        currUsers--;
-        if (currUsers == 0) {
-            inUse = false;
-            using = null;
-            notifyAll();
+        if (inUse && g == using) { // Only decrease if curr gender is using bathroom
+            currUsers--;
+            if (currUsers == 0) {
+               inUse = false;
+                using = null; 
+               notifyAll();
+            }
         }
-        //System.out.println("\t-:U="+currUsers+" G="+using+" Busy="+inUse);
-
+        else { System.out.println("ERROR!!!!!"); } //WTF
+        System.out.println("\t"+g+"-:NumIn="+currUsers+" type="+using+" turn="+turn+" busy="+inUse);
    }
    
    

@@ -20,10 +20,6 @@ public class TestProtocol implements Runnable {
 	            //System.out.println("in male");
 	            BP.enterMale();
 	            //do something manly
-/*				int val = rand.nextInt(10) + 1;
-				try {
-					Thread.sleep(val);
-				} catch (InterruptedException e){}*/
 	            BP.leaveMale();
 	            gen_out="Man";
 	            break;
@@ -35,33 +31,38 @@ public class TestProtocol implements Runnable {
 	            gen_out="Fem";
 	            break;
 	    }  
-
-        //System.out.println("  "+gen_out+" thread done.");
+        System.out.println("  "+gen_out+" done.");
 	}
     
 
-	public static void main(String[] args) {
+	public static void main(String[] args) { // TestProtocol <num_iterations> <0or1_protocol>
 		int N;
-		int protocol = 0;
+		int protocol = 0; //LockBathroomProtocol by default
+		
 		if(args.length > 0){
 			N = Integer.parseInt(args[0]);
 			if(args.length > 1){
 				protocol = Integer.parseInt(args[1]);
 			}
-		} else{
+		} 
+		else {
 	        N = 1000;
 		}
+		
         Gender g;
         Random rand = new Random();
 
 		BathroomProtocol bp;
-		if(protocol == 1){ 
-			bp = new SyncBathroomProtocol2();
-            System.out.println ("Sync Protocol ");
-		} else{
-			bp = new LockBathroomProtocol();
-            System.out.println ("Lock Protocol ");
+		
+		if(protocol == 1) { 
+			bp = new SyncBathroomProtocol();
+            System.out.println ("--Sync Protocol ");
+		} 
+		else {
+			bp = new LockBathroomProtocol3();
+            System.out.println ("--Lock Protocol ");
 		}
+		
         Thread[] t = new Thread[N];
 		
 		for(int x=0; x<N; x++) {
