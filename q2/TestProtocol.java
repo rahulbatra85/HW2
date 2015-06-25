@@ -31,7 +31,7 @@ public class TestProtocol implements Runnable {
 	            gen_out="Fem";
 	            break;
 	    }  
-        System.out.println("  "+gen_out+" done.");
+        //System.out.println("  "+gen_out+" done.");
 	}
     
 
@@ -74,7 +74,7 @@ public class TestProtocol implements Runnable {
 		        else g = Gender.FEMALE;
 				
                 t[i] = new Thread(new TestProtocol(bp, g));
-                //System.out.println("Gen "+g);
+                // System.out.println("Gen "+g);
 		    }
 			 
             for(int i=0; i<N; i++)
