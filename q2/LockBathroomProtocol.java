@@ -8,7 +8,7 @@ public class LockBathroomProtocol implements BathroomProtocol {
 
 	//State variables
 	volatile int nF, wF, nM, wM; //females inside, waiting females, males inside, waiting males
-	boolean femaleTurn, maleTurn;
+	volatile boolean femaleTurn, maleTurn;
 
 	LockBathroomProtocol(){
 		monitorLock = new ReentrantLock();
