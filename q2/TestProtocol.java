@@ -15,7 +15,7 @@ public class TestProtocol implements Runnable {
 	    //System.out.println(" "+gen);
 	    switch (gen) {
 	        case MALE:
-	           // System.out.println("in male");
+	            //System.out.println("in male");
 	            BP.enterMale();
 	            //do something manly
 	            BP.leaveMale();
@@ -24,7 +24,7 @@ public class TestProtocol implements Runnable {
 	        case FEMALE:
 	            //System.out.println("in fem");
 	        	BP.enterFemale();
-	            //do something girly 
+	            //do something girly  
 	            BP.leaveFemale();
 	            gen_out="Fem";
 	            break;
@@ -35,11 +35,11 @@ public class TestProtocol implements Runnable {
     
 
 	public static void main(String[] args) {
-        int N = 250;
+        int N = 1000;
         Gender g;
         Random rand = new Random();
         
-		BathroomProtocol bp = new SyncBathroomProtocol();
+		BathroomProtocol bp = new LockBathroomProtocol();
         Thread[] t = new Thread[N];
 		
 		for(int x=0; x<N; x++) {
@@ -49,6 +49,9 @@ public class TestProtocol implements Runnable {
 		    
 		        if (rand.nextInt(2) > 0) g = Gender.MALE;
 		        else g = Gender.FEMALE;
+				
+//		        if (i == 3) g = Gender.MALE;
+//		        else g = Gender.FEMALE;
 		        
                 t[i] = new Thread(new TestProtocol(bp, g));
                 //System.out.println("Gen "+g);
