@@ -1,7 +1,7 @@
 // Use locks and condition variables to implement this bathroom protocol
 import java.util.concurrent.locks.*;
 
-public class LockBathroomProtocol3 implements BathroomProtocol {
+public class LockBathroomProtocol implements BathroomProtocol {
      // declare the lock and conditions here
 	ReentrantLock monitorLock;
 	Condition maleQ, femaleQ;
@@ -11,7 +11,7 @@ public class LockBathroomProtocol3 implements BathroomProtocol {
 	static final boolean MALE = false, FEMALE = true;
 	volatile boolean turn;
 
-	LockBathroomProtocol3() {
+	LockBathroomProtocol() {
 		monitorLock = new ReentrantLock();
 		maleQ = monitorLock.newCondition();
 		femaleQ = monitorLock.newCondition();
@@ -54,11 +54,13 @@ public class LockBathroomProtocol3 implements BathroomProtocol {
 
   public void leaveMale() {
 	monitorLock.lock(); 	//Acquire Lock
-	
-	inM--;	//Decrement male inside count
-	if (inM == 0) femaleQ.signalAll();
-	
-	monitorLock.unlock();	//Release Lock
+	try {
+	    inM--;	//Decrement male inside count
+	    if (inM == 0) femaleQ.signalAll();
+	}
+    finally {	
+	    monitorLock.unlock();	//Release Lock
+    }
   }
 
   public void enterFemale() {
@@ -84,19 +86,20 @@ public class LockBathroomProtocol3 implements BathroomProtocol {
     catch(InterruptedException e) {
     }
 	finally {
-		monitorLock.unlock(); 	//Release Lock
-		
+		monitorLock.unlock(); 	//Release Lock	
 	} 
 
   }
 
   public void leaveFemale() {
 	monitorLock.lock(); 	//Acquire Lock
-	
-	inF--;	//Decrement female inside count
-	if (inF == 0) maleQ.signalAll(); //Signal male queue if all females are out
-	
-	monitorLock.unlock();	//Release Lock
+	try {
+	    inF--;	//Decrement female inside count
+	    if (inF == 0) maleQ.signalAll(); //Signal male queue if all females are out
+	}
+    finally {
+	    monitorLock.unlock();	//Release Lock
+    }
   }
 
   public String getState(){

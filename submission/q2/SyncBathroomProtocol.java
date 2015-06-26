@@ -46,14 +46,13 @@ public class SyncBathroomProtocol implements BathroomProtocol {
     
     protected synchronized void increaseUsers (Gender g) { 
         //System.out.println("\t+:U="+currUsers+" G="+using+" Busy="+inUse);
-        //while ( inUse && g.getOpposite()==using ) {
-        while ( (inUse && g.getOpposite()==using) || (g!=turn && g==using)  ) {
+        //while ( inUse && g.getOpposite()==using ) { //SAME AS BELOW ... better be safe though
+        while ( (inUse && g.getOpposite()==using) || (g!=turn && g==using) ) {
             try { 
                 wait();
             }
             catch (Exception e) {}
         }
-
         inUse = true;
         currUsers++; 
         using = g;
@@ -63,7 +62,7 @@ public class SyncBathroomProtocol implements BathroomProtocol {
    
    protected synchronized void decreaseUsers(Gender g) { 
         //System.out.println("\t-:U="+currUsers+" G="+using+" Busy="+inUse);
-        if (inUse && g == using) { // Only decrease if curr gender is using bathroom
+        if (inUse && g==using) { // Only decrease if curr gender is using bathroom
             currUsers--;
             if (currUsers == 0) {
                inUse = false;

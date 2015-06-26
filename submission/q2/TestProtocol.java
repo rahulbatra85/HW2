@@ -59,13 +59,13 @@ public class TestProtocol implements Runnable {
             System.out.println ("--Sync Protocol ");
 		} 
 		else {
-			bp = new LockBathroomProtocol3();
+			bp = new LockBathroomProtocol();
             System.out.println ("--Lock Protocol ");
 		}
 		
         Thread[] t = new Thread[N];
 		
-		for(int x=0; x<N; x++) {
+		for(int x=0; x<10; x++) {
             System.out.println ("Iteration "+x);
 
 		    for(int i=0; i<N; i++) {
@@ -91,3 +91,4 @@ public class TestProtocol implements Runnable {
 	}//end main
 }
 
+ 
